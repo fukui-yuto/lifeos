@@ -1,0 +1,41 @@
+<Window x:Class="LifeOS.Views.TaskEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="タスクの編集" Height="340" Width="420"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="タイトル" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <TextBox Grid.Row="1" x:Name="TitleBox" Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="2" Text="優先度" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <ComboBox Grid.Row="3" x:Name="PriorityBox" Margin="0,0,0,12"
+                  SelectedIndex="1">
+            <ComboBoxItem Content="低"/>
+            <ComboBoxItem Content="中"/>
+            <ComboBoxItem Content="高"/>
+        </ComboBox>
+
+        <TextBlock Grid.Row="4" Text="期限日" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <DatePicker Grid.Row="5" x:Name="DueDatePicker" Margin="0,0,0,12"/>
+
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="キャンセル" Click="Cancel_Click" Margin="0,0,8,0" Padding="16,8"/>
+            <Button Content="保存" Click="Save_Click" Padding="16,8"
+                    Background="#5B6BF5" Foreground="White" BorderThickness="0"/>
+        </StackPanel>
+    </Grid>
+</Window>

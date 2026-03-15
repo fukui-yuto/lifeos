@@ -1,0 +1,45 @@
+<Window x:Class="LifeOS.Views.GoalEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="目標の編集" Height="460" Width="480"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="タイトル" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <TextBox Grid.Row="1" x:Name="TitleBox" Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="2" Text="説明" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <TextBox Grid.Row="3" x:Name="DescriptionBox" Height="60"
+                 AcceptsReturn="True" TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto" Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="4" Text="目標期限" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <DatePicker Grid.Row="5" x:Name="TargetDatePicker" Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="6" Text="紐づけるノート（複数選択可）" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <ListBox Grid.Row="7" x:Name="NoteListBox"
+                 SelectionMode="Multiple"
+                 DisplayMemberPath="Title"
+                 BorderBrush="#DDDDEE" BorderThickness="1"/>
+
+        <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="キャンセル" Click="Cancel_Click" Margin="0,0,8,0" Padding="16,8"/>
+            <Button Content="保存" Click="Save_Click" Padding="16,8"
+                    Background="#5B6BF5" Foreground="White" BorderThickness="0"/>
+        </StackPanel>
+    </Grid>
+</Window>

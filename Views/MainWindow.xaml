@@ -1,0 +1,155 @@
+<Window x:Class="LifeOS.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="LifeOS" Height="680" Width="900"
+        MinHeight="500" MinWidth="700"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style x:Key="SidebarButton" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}"
+                                CornerRadius="4" Margin="4,2">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#3A3A5C"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#2A2A3C"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#5B6BF5"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#4A5AE4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#E05555"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#C04444"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- サイドバー -->
+        <Border Grid.Column="0" Background="#1E1E2E">
+            <StackPanel Margin="0,16,0,0">
+                <TextBlock Text="LifeOS" FontSize="20" FontWeight="Bold"
+                           Foreground="White" Margin="20,0,0,20"/>
+
+                <RadioButton Content="🗒  ノートボード" Style="{StaticResource SidebarButton}"
+                             GroupName="Nav" IsChecked="True"
+                             Checked="Nav_Notes"/>
+                <RadioButton Content="✅  タスク" Style="{StaticResource SidebarButton}"
+                             GroupName="Nav"
+                             Checked="Nav_Tasks"/>
+                <RadioButton Content="🎯  目標" Style="{StaticResource SidebarButton}"
+                             GroupName="Nav"
+                             Checked="Nav_Goals"/>
+                <RadioButton Content="📋  操作ログ" Style="{StaticResource SidebarButton}"
+                             GroupName="Nav"
+                             Checked="Nav_Logs"/>
+
+                <Separator Margin="16,16" Background="#333355"/>
+
+                <Button Content="＋  ノートを追加" Style="{StaticResource PrimaryButton}"
+                        Margin="12,4" Click="AddNote_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- メインコンテンツ -->
+        <Grid Grid.Column="1" Background="#F5F5F7">
+            <!-- 付箋ボード -->
+            <ScrollViewer x:Name="NotesView" VerticalScrollBarVisibility="Auto">
+                <WrapPanel x:Name="NotesPanel" Margin="20" ItemWidth="240"/>
+            </ScrollViewer>
+
+            <!-- タスク一覧 -->
+            <Grid x:Name="TasksView" Visibility="Collapsed" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="タスク" FontSize="20" FontWeight="Bold" Margin="0,0,0,16"/>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="TaskGroupPanel"/>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- 学習目標 -->
+            <Grid x:Name="GoalsView" Visibility="Collapsed" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="目標" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <Button Content="+ 目標追加" Style="{StaticResource PrimaryButton}"
+                            Margin="16,0,0,0" Click="AddGoal_Click"/>
+                </StackPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="GoalsPanel"/>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- 操作ログ -->
+            <Grid x:Name="LogsView" Visibility="Collapsed" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="操作ログ" FontSize="20" FontWeight="Bold" Margin="0,0,0,16"/>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="LogsPanel"/>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

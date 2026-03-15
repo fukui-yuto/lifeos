@@ -1,0 +1,329 @@
+<Window x:Class="LifeOS.Views.StickyNoteWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanResizeWithGrip"
+        Width="260" Height="320"
+        MinWidth="200" MinHeight="160"
+        ShowInTaskbar="False">
+
+    <Window.Resources>
+        <Style x:Key="HeaderBtn" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1A000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SectionToggleBtn" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="FontSize" Value="8"/>
+            <Setter Property="Foreground" Value="#66000000"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="3" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#18000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AddTaskBtn" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1A000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border x:Name="RootBorder" CornerRadius="16" Background="{Binding Color}">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="28" Opacity="0.18" ShadowDepth="8" Direction="270"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="44"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition x:Name="MemoRow" Height="2*" MinHeight="0"/>
+                <RowDefinition Height="22"/>
+                <RowDefinition x:Name="TaskListRow" Height="*" MinHeight="0"/>
+                <RowDefinition x:Name="AddTaskRowDef" Height="Auto"/>
+                <RowDefinition Height="6"/>
+            </Grid.RowDefinitions>
+
+            <!-- ヘッダー -->
+            <Grid Grid.Row="0" x:Name="TitleBar"
+                  PreviewMouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+                  Cursor="SizeAll">
+                <Border CornerRadius="16,16,0,0" Background="#10000000"/>
+                <Grid Margin="10,0,6,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0"
+                             Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                             Background="Transparent" BorderThickness="0"
+                             FontWeight="Bold" FontSize="13.5" Foreground="#1A1A1A"
+                             VerticalAlignment="Center" VerticalContentAlignment="Center"
+                             Padding="2,0" CaretBrush="#333">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="TextBox">
+                                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Button Grid.Column="1" Style="{StaticResource HeaderBtn}"
+                            Click="OpenManager_Click" ToolTip="管理ボードを開く">
+                        <TextBlock Text="⊞" FontSize="14" Foreground="#444"/>
+                    </Button>
+                    <Button Grid.Column="2" Style="{StaticResource HeaderBtn}"
+                            Click="Close_Click" ToolTip="閉じる" Margin="0,0,2,0">
+                        <TextBlock Text="✕" FontSize="11" Foreground="#666"/>
+                    </Button>
+                </Grid>
+            </Grid>
+
+            <!-- タイトルバー下区切り -->
+            <Rectangle Grid.Row="0" Height="1" VerticalAlignment="Bottom"
+                       Fill="#15000000" Margin="10,0"/>
+
+            <!-- メモセクションヘッダー (Row 1) -->
+            <Grid Grid.Row="1" Margin="12,0,12,0" Cursor="Arrow">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="メモ"
+                           FontSize="10" FontWeight="SemiBold"
+                           Foreground="#55000000" VerticalAlignment="Center"
+                           Margin="0,0,6,0" IsHitTestVisible="False"/>
+                <Rectangle Grid.Column="1" Height="1" Fill="#14000000"
+                           VerticalAlignment="Center" IsHitTestVisible="False"/>
+                <Button Grid.Column="2" x:Name="MemoToggleBtn"
+                        Style="{StaticResource SectionToggleBtn}"
+                        Content="▼" Click="MemoToggle_Click"/>
+            </Grid>
+
+            <!-- テキストメモ (Row 2) -->
+            <TextBox Grid.Row="2" x:Name="MemoTextBox"
+                     Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}"
+                     Background="Transparent" BorderThickness="0"
+                     AcceptsReturn="True" TextWrapping="Wrap"
+                     FontSize="12" Foreground="#333" CaretBrush="#444"
+                     Padding="12,4,12,4"
+                     VerticalScrollBarVisibility="Auto">
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TextBox">
+                                    <ScrollViewer x:Name="PART_ContentHost"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+
+            <!-- チェックリストヘッダー + GridSplitter (Row 3) -->
+            <!-- GridSplitter は背面、ヘッダー内容は前面 -->
+            <GridSplitter Grid.Row="3"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                          Background="Transparent" Cursor="SizeNS"
+                          ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
+                          Panel.ZIndex="0"/>
+            <Grid Grid.Row="3" Margin="12,0,10,0" Cursor="SizeNS" Panel.ZIndex="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="チェックリスト"
+                           FontSize="10.5" FontWeight="SemiBold"
+                           Foreground="#66000000" VerticalAlignment="Center"
+                           Margin="0,0,8,0" IsHitTestVisible="False"/>
+                <Rectangle Grid.Column="1" Height="1" Fill="#18000000"
+                           VerticalAlignment="Center" IsHitTestVisible="False"/>
+                <Button Grid.Column="2" x:Name="TaskToggleBtn"
+                        Style="{StaticResource SectionToggleBtn}"
+                        Content="▼" Click="TaskToggle_Click"
+                        Cursor="Hand"/>
+            </Grid>
+
+            <!-- タスクリスト (Row 4) -->
+            <ScrollViewer Grid.Row="4" x:Name="TaskListScroll"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl x:Name="TaskList" ItemsSource="{Binding Tasks}"
+                              Margin="12,2,12,0" HorizontalAlignment="Stretch">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel HorizontalAlignment="Stretch"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Grid.Column="0"
+                                          IsChecked="{Binding IsCompleted, Mode=OneWay}"
+                                          VerticalAlignment="Top"
+                                          Click="TaskCheck_Click"
+                                          Padding="4,1,0,0"
+                                          HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Stretch">
+                                    <TextBox Text="{Binding Title, Mode=OneWay}"
+                                             FontSize="12"
+                                             TextWrapping="Wrap"
+                                             Background="Transparent" BorderThickness="0"
+                                             Padding="0" Margin="0"
+                                             OverridesDefaultStyle="True"
+                                             LostFocus="TaskTitle_LostFocus"
+                                             KeyDown="TaskTitle_KeyDown">
+                                        <TextBox.Style>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="Foreground" Value="#333"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="TextBox">
+                                                            <ScrollViewer x:Name="PART_ContentHost"
+                                                                          Margin="0"
+                                                                          OverridesDefaultStyle="True"/>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                        <Setter Property="Foreground" Value="#888"/>
+                                                        <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBox.Style>
+                                    </TextBox>
+                                </CheckBox>
+                                <Button Grid.Column="1" Content="✕" FontSize="10"
+                                        Foreground="#AAA" Style="{StaticResource AddTaskBtn}"
+                                        Width="18" Height="18"
+                                        Click="TaskDelete_Click" Tag="{Binding}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- タスク追加行 (Row 5) -->
+            <Grid Grid.Row="5" x:Name="AddTaskArea" Margin="12,4,12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="＋" FontSize="13"
+                           Foreground="#55000000" VerticalAlignment="Center"
+                           Margin="0,0,6,0"/>
+                <TextBox Grid.Column="1"
+                         x:Name="NewTaskBox"
+                         Text="{Binding NewTaskTitle, UpdateSourceTrigger=PropertyChanged}"
+                         BorderThickness="0"
+                         Background="Transparent" FontSize="12"
+                         Foreground="#444" CaretBrush="#444"
+                         Padding="0,2"
+                         KeyDown="NewTaskBox_KeyDown"
+                         GotFocus="NewTaskBox_GotFocus"
+                         LostFocus="NewTaskBox_LostFocus"
+                         Tag="タスクを追加… (Enterで確定)">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TextBox">
+                                        <Grid>
+                                            <TextBlock x:Name="Placeholder"
+                                                       Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                                       Foreground="#66000000" FontStyle="Italic"
+                                                       FontSize="12" Padding="0,2"
+                                                       Visibility="Collapsed"/>
+                                            <ScrollViewer x:Name="PART_ContentHost" Padding="0,2"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions>
+                                                    <Condition Property="Text" Value=""/>
+                                                    <Condition Property="IsFocused" Value="False"/>
+                                                </MultiTrigger.Conditions>
+                                                <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                                            </MultiTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+            </Grid>
+
+            <!-- 下余白 (Row 6) -->
+            <Border Grid.Row="6" Height="6"/>
+        </Grid>
+    </Border>
+</Window>
